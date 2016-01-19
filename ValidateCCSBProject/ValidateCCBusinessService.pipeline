@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:pipelineEntry xmlns:con="http://www.bea.com/wli/sb/pipeline/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:con1="http://www.bea.com/wli/sb/stages/config" xmlns:con2="http://www.bea.com/wli/sb/stages/transform/config" xmlns:con3="http://www.bea.com/wli/sb/stages/logging/config" xmlns:con4="http://www.bea.com/wli/sb/stages/alert/config">
+    <con:coreEntry>
+        <con:binding type="SOAP" isSoap12="false" xsi:type="con:SoapBindingType">
+            <con:wsdl ref="ValidateCCSBProject/bpelprocess1_client_ep"/>
+            <con:binding>
+                <con:name>BPELProcess1Binding</con:name>
+                <con:namespace>http://xmlns.oracle.com/SampleServiceBusApplication/ValidateCCSOAProject/BPELProcess1</con:namespace>
+            </con:binding>
+        </con:binding>
+        <con:xqConfiguration>
+            <con:snippetVersion>1.0</con:snippetVersion>
+        </con:xqConfiguration>
+    </con:coreEntry>
+    <con:router>
+        <con:pipeline type="request" name="request-7f000001.N64bd5088.0.1524a69f80a.N7e48">
+            <con:stage id="_StageId-7f000001.N64bd5088.0.1524a69f80a.N7e46" name="Stage1">
+                <con:context>
+                    <con1:userNsDecl prefix="bpel" namespace="http://xmlns.oracle.com/SampleServiceBusApplication/ValidateCCSOAProject/BPELProcess1"/>
+                </con:context>
+                <con:actions>
+                    <con2:ifThenElse>
+                        <con1:id>_ActionId-7f000001.N64bd5088.0.1524a69f80a.N7e3e</con1:id>
+                        <con2:case id="_BranchId-7f000001.N64bd5088.0.1524a69f80a.N7e3d">
+                            <con2:condition>
+                                <con1:xqueryText>fn:string-length($body/bpel:process/bpel:cardNumber) = 0</con1:xqueryText>
+                            </con2:condition>
+                            <con2:actions>
+                                <con4:alert>
+                                    <con1:id>_ActionId-7f000001.N64bd5088.0.1524a69f80a.N7dc3</con1:id>
+                                    <con4:destination ref="ValidateCCSBProject/CCAlertDestination"/>
+                                    <con4:description>credit number comes blank</con4:description>
+                                    <con4:severity>major</con4:severity>
+                                    <con4:payload>
+                                        <con1:xqueryText>$body</con1:xqueryText>
+                                    </con4:payload>
+                                </con4:alert>
+                            </con2:actions>
+                        </con2:case>
+                        <con2:default/>
+                    </con2:ifThenElse>
+                </con:actions>
+            </con:stage>
+        </con:pipeline>
+        <con:pipeline type="response" name="response-7f000001.N64bd5088.0.1524a69f80a.N7e47">
+            <con:stage id="_StageId-7f000001.N64bd5088.0.1524a69f80a.N7e45" name="Stage1">
+                <con:context/>
+                <con:actions/>
+            </con:stage>
+        </con:pipeline>
+        <con:flow>
+            <con:pipeline-node name="PipelinePairNode1">
+                <con:request>request-7f000001.N64bd5088.0.1524a69f80a.N7e48</con:request>
+                <con:response>response-7f000001.N64bd5088.0.1524a69f80a.N7e47</con:response>
+            </con:pipeline-node>
+            <con:route-node name="ValidateCCBusinessService" xmlns:con1="http://www.bea.com/wli/sb/stages/routing/config" xmlns:con2="http://www.bea.com/wli/sb/stages/config">
+                <con:context>
+                    <con2:userNsDecl prefix="bpel" namespace="http://xmlns.oracle.com/SampleServiceBusApplication/ValidateCCSOAProject/BPELProcess1"/>
+                </con:context>
+                <con:actions>
+                    <con1:route>
+                        <con2:id>actionid-routeaction</con2:id>
+                        <con1:service ref="ValidateCCSBProject/ValidateCCBusinessService" xsi:type="ref:BusinessServiceRef" xmlns:ref="http://www.bea.com/wli/sb/reference"/>
+                        <con1:operation passThrough="true"/>
+                        <con1:outboundTransform></con1:outboundTransform>
+                        <con1:responseTransform/>
+                    </con1:route>
+                </con:actions>
+            </con:route-node>
+        </con:flow>
+    </con:router>
+</con:pipelineEntry>
